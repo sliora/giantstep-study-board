@@ -12,17 +12,15 @@ public class BoardCommentListDto {
     private String boardCommentWriter;
     private String boardCommentContents;
     private Long boardId;
-    private String boardCommentPassword;
     private LocalDateTime boardCommentUpdateDate;
 
     @QueryProjection
     public BoardCommentListDto(Long boardCommentId, String boardCommentWriter, String boardCommentContents,
-                               Long boardId, String boardCommentPassword, LocalDateTime boardCommentUpdateDate) {
+                               Long boardId, LocalDateTime boardCommentUpdateDate) {
         this.boardCommentId = boardCommentId;
         this.boardCommentWriter = boardCommentWriter;
         this.boardCommentContents = boardCommentContents;
         this.boardId = boardId;
-        this.boardCommentPassword = boardCommentPassword;
         this.boardCommentUpdateDate = boardCommentUpdateDate;
     }
 }

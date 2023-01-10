@@ -50,8 +50,9 @@ public class BoardComment extends BaseTimeEntity {
         return updateBoardComment;
     }
 
-    public void deleteBoardComment() {
+    public Boolean deleteBoardComment() {
         this.deletedYn = "Y";
+        return true;
     }
 
 }

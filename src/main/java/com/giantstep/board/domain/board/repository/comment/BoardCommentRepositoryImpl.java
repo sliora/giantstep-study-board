@@ -29,7 +29,6 @@ public class BoardCommentRepositoryImpl implements BoardCommentRepositoryCustom{
                         boardComment.writer,
                         boardComment.contents,
                         boardComment.board.id,
-                        boardComment.password,
                         boardComment.updateDate
                 ))
                 .from(boardComment)

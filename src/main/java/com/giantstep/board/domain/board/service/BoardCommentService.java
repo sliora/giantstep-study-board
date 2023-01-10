@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,19 @@ public class BoardCommentService {
     }
 
     @Transactional
-    public void deleteBoardComment(Long boardCommentId) {
-        boardCommentRepository.findById(boardCommentId).get().deleteBoardComment();
+    public Boolean deleteBoardComment(Long boardCommentId, String deleteBoardCommentPassword) {
+
+        //AtomicReference : CAS(compare-and-swap)를 이용하여 자바의 동시성을 보장하는 클래스.
+        AtomicReference<Boolean> successDeleteBoardComment = new AtomicReference<>(false);
+
+        //삭제할 댓글의 비밀번호 검증
+        Optional<BoardComment> deleteBoardCommentCheckPassword = boardCommentRepository.findBoardCommentByIdAndPassword(boardCommentId, deleteBoardCommentPassword);
+
+        //Optional<T> ifPresent() : Optional 객체가 값을 가지고 있으면 실행
+        deleteBoardCommentCheckPassword.ifPresent(object->{
+             successDeleteBoardComment.set(boardCommentRepository.findById(deleteBoardCommentCheckPassword.get().getId()).get().deleteBoardComment());
+        });
+
+        return successDeleteBoardComment.get();
     }
 }

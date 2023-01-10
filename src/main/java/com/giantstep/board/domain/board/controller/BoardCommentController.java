@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,9 +32,10 @@ public class BoardCommentController extends UtilsMethod {
         return "redirect:detail";
     }
 
+    @ResponseBody
     @PostMapping("{boardId}/{boardCommentId}")
-    public String commentDeleteDone(@PathVariable("boardId") Long boardId, @PathVariable("boardCommentId") Long boardCommentId) {
-        boardCommentService.deleteBoardComment(boardCommentId);
-        return "redirect:detail";
+    public Boolean commentDeleteDone(@PathVariable("boardId") Long boardId, @PathVariable("boardCommentId") Long boardCommentId,
+                                    @RequestParam("insertDeleteBoardComment") String deleteBoardCommentPassword) {
+        return boardCommentService.deleteBoardComment(boardCommentId, deleteBoardCommentPassword);
     }
 }
