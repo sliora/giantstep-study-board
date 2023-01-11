@@ -83,8 +83,34 @@
                 <a th:text="${boardCommentList.boardCommentWriter}"></a>
                 <a th:text="${boardCommentList.boardCommentUpdateDate}"></a>
 
-                <button type="button" data-bs-toggle="collapse"
-                        th:attr="data-bs-target=|#c${boardCommentList.boardCommentId}"> 수정</button>
+                <!-- Button trigger modal -->
+                <button type="button" data-bs-toggle="modal"
+                        th:attr="data-bs-target=|#b${boardCommentList.boardCommentId}"> 수정</button>
+
+                <!-- 댓글 수정 Modal 시작 -->
+                <div class="modal fade" th:id="b + ${boardCommentList.boardCommentId}" tabindex="-1" role="dialog" aria-labelledby="modalCenterTitleUpdateBoardComment" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalCenterTitleUpdateBoardComment">수정할 댓글 내용을 입력하세요.</h5>
+                            </div>
+                            <div class="modal-body">
+                                <form id="updateBoardCommentForm">
+                                    <input hidden th:value="${boardCommentList.boardCommentId}" id="updateBoardCommentId" >
+                                    <textarea th:text="${boardCommentList.boardCommentContents}" id="updateBoardCommentContents"></textarea>
+                                    <br>
+                                    <input id="updateBoardCommentPassword" placeholder="비밀번호 입력하세요" >
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary waves-effect wave-light" data-dismiss="modal" >취소하기</button>
+                                <button type="button" onclick="commentUpdateDone()" class="btn btn-danger waves-effect wave-light">수정하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 댓글 수정 Modal 끝 -->
+
                 <!-- Button trigger modal -->
                 <button type="button" data-bs-toggle="modal"
                         th:attr="data-bs-target=|#c${boardCommentList.boardCommentId}"> 삭제 </button>
@@ -99,7 +125,7 @@
                             <div class="modal-body">
                                 <form id="commentDeleteCheckForm">
                                     <input hidden id="deleteBoardCommentId" th:value="${boardCommentList.boardCommentId}">
-                                    <input id="insertDeleteBoardCommentPassword">
+                                    <input id="insertDeleteBoardCommentPassword" placeholder="비밀번호 입력하세요.">
                                 </form>
                             </div>
                             <div class="modal-footer">
@@ -112,19 +138,11 @@
                 <!-- 댓글 삭제 Modal 끝 -->
 
                 <br>
-                <a class="collapse show" th:id="c + ${boardCommentList.boardCommentId}" th:text="${boardCommentList.boardCommentContents}"></a>
+                <textarea th:id="c + ${boardCommentList.boardCommentId}" th:text="${boardCommentList.boardCommentContents}" readonly></textarea>
                 <br>
             </div>
 
-            <div name="boardCommentUpdateForm" class="collapse" th:id="c + ${boardCommentList.boardCommentId}">
-                <form id="updateBoardCommentForm" th:object="${boardCommentUpdateForm}" >
 
-                    <input hidden th:value="${boardCommentList.boardCommentId}" name="updateBoardCommentID">
-                    <input name="boardCommentContents" th:value="${boardCommentList.boardCommentContents}" id="updateBoardCommentContents" >
-                    <input th:field="*{boardCommentPassword}" id="updateBoardCommentPassword" placeholder="비밀번호 입력하세요" >
-                    <button onclick="commentUpdateDone()">완료</button>
-                </form>
-            </div>
             <hr>
         </div>
 
@@ -173,8 +191,6 @@
 
     <script type="text/javascript">
 
-        const boardCommentPassword = document.getElementById('boardCommentPassword').value;
-
         function commentAddDone() {
             const data = {
                 addBoardCommentWriter: document.getElementById('addBoardCommentWriter').value,
@@ -207,6 +223,7 @@
 
         function commentUpdateDone() {
             const data = {
+                updateBoardCommentId : document.getElementById('updateBoardCommentId').value,
                 updateBoardCommentContents: document.getElementById('updateBoardCommentContents').value,
                 updateBoardCommentPassword: document.getElementById('updateBoardCommentPassword').value
             }
@@ -219,14 +236,31 @@
                 alert("비밀번호는 공백일 수 없습니다!");
                 return false;
             }
-            else if (!(data.updateBoardCommentPassword === boardCommentPassword) ){
-                alert("비밀번호가 일치하지 않습니다. 다시 확인하세요!");
-                return false;
-            }
 
-            document.getElementById('updateBoardCommentForm').method = 'POST';
-            document.getElementById('updateBoardCommentForm').action = 'updateBoardComment';
-            document.getElementById('updateBoardCommentForm').submit();
+            $.ajax({
+                url : "checkUpdateBoardCommentRequest",
+                type : "POST",
+                contentType: 'application/json; charset=utf-8',
+                data : JSON.stringify({
+                    "boardCommentId" : data.updateBoardCommentId,
+                    "boardCommentContents" : data.updateBoardCommentContents,
+                    "boardCommentPassword" : data.updateBoardCommentPassword
+                }),
+                success : function (data) {
+                    if (data == true){
+                        document.location.reload();
+                    }
+                    else if (data == false) {
+                        alert("비밀번호가 틀립니다. 다시 확인하세요!");
+                        return false;
+                    }
+                },
+                error : function () {
+                    alert("에러가 발생했습니다.");
+                    return false;
+                }
+            });
+
         };
 
         function commentDeleteDone() {

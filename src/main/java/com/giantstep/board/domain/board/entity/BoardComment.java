@@ -45,9 +45,9 @@ public class BoardComment extends BaseTimeEntity {
         this.deletedYn = deletedYn;
     }
 
-    public BoardComment updateBoardComment(BoardComment updateBoardComment) {
+    public Boolean updateBoardComment(BoardComment updateBoardComment) {
         this.contents = updateBoardComment.getContents();
-        return updateBoardComment;
+        return true;
     }
 
     public Boolean deleteBoardComment() {

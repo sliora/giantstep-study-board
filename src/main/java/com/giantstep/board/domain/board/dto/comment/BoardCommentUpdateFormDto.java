@@ -5,14 +5,15 @@ import lombok.Data;
 
 @Data
 public class BoardCommentUpdateFormDto {
-    private Long updateBoardCommentID;
+    private Long boardCommentId;
     private String boardCommentContents;
     private String boardCommentPassword;
 
     public BoardComment toEntity() {
         BoardComment boardComment = BoardComment.createBoardComment()
-                .boardCommentId(updateBoardCommentID)
+                .boardCommentId(boardCommentId)
                 .boardCommentContents(boardCommentContents)
+                .boardCommentPassword(boardCommentPassword)
                 .build();
         return boardComment;
     }

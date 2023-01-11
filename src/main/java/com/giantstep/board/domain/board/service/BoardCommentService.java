@@ -30,11 +30,6 @@ public class BoardCommentService {
     }
 
     @Transactional
-    public Long updateBoardComment(BoardComment updateBoardComment) {
-        return boardCommentRepository.findById(updateBoardComment.getId()).get().updateBoardComment(updateBoardComment).getId();
-    }
-
-    @Transactional
     public Boolean deleteBoardComment(Long boardCommentId, String deleteBoardCommentPassword) {
 
         //AtomicReference : CAS(compare-and-swap)를 이용하여 자바의 동시성을 보장하는 클래스.
@@ -49,5 +44,19 @@ public class BoardCommentService {
         });
 
         return successDeleteBoardComment.get();
+    }
+
+    @Transactional
+    public Boolean updateBoardComment(BoardComment updateBoardComment) {
+
+        AtomicReference<Boolean> checkUpdateBoardCommentRequestFlag = new AtomicReference<>(false);
+
+        Optional<BoardComment> updateBoardCommentCheckPassword = boardCommentRepository.findBoardCommentByIdAndPassword(updateBoardComment.getId(), updateBoardComment.getPassword());
+
+        updateBoardCommentCheckPassword.ifPresent(object->{
+            checkUpdateBoardCommentRequestFlag.set(boardCommentRepository.findById(updateBoardCommentCheckPassword.get().getId()).get().updateBoardComment(updateBoardComment));
+        });
+
+        return checkUpdateBoardCommentRequestFlag.get();
     }
 }
