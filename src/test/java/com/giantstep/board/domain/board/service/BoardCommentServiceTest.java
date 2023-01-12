@@ -113,16 +113,30 @@ class BoardCommentServiceTest {
     void 댓글_수정() {
 
         //give
+        long boardId = 177;
+        Board findBoard = boardRepository.findById(boardId).get();
+
+        BoardComment boardComment = BoardComment.createBoardComment()
+                .boardCommentWriter("테스터정준")
+                .boardCommentContents("댓글 테스트 데이터 입니다.")
+                .boardCommentPassword("1234")
+                .board(findBoard)
+                .deletedYn("N")
+                .build();
+
+        BoardComment saveBoardComment = boardCommentRepository.save(boardComment);
+
         BoardComment updateBoardComment = BoardComment.createBoardComment()
-                .boardCommentId(13L)
+                .boardCommentId(saveBoardComment.getId())
                 .boardCommentContents("수정된 댓글")
                 .build();
 
         //when
-        BoardComment updateDoneBoardComment = boardCommentRepository.findById(updateBoardComment.getId()).get().updateBoardComment(updateBoardComment);
+        Boolean updateDoneBoardComment = boardCommentRepository.findById(updateBoardComment.getId()).get().updateBoardComment(updateBoardComment);
 
         //then
-        assertEquals(updateDoneBoardComment.getContents(), updateBoardComment.getContents());
+        assertEquals(updateDoneBoardComment, true);
+        assertEquals(saveBoardComment.getContents(), updateBoardComment.getContents());
     }
 
     @Test

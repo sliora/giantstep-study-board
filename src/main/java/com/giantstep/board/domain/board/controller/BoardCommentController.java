@@ -1,7 +1,8 @@
 package com.giantstep.board.domain.board.controller;
 
 import com.giantstep.board.domain.board.dto.comment.BoardCommentAddFormDto;
-import com.giantstep.board.domain.board.dto.comment.BoardCommentUpdateFormDto;
+import com.giantstep.board.domain.board.dto.comment.BoardCommentDeleteCheckRequest;
+import com.giantstep.board.domain.board.dto.comment.BoardCommentUpdateCheckRequest;
 import com.giantstep.board.domain.board.service.BoardCommentService;
 import com.giantstep.board.utils.UtilsMethod;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +29,15 @@ public class BoardCommentController extends UtilsMethod {
     @ResponseBody
     @PostMapping("{boardId}/checkUpdateBoardCommentRequest")
     public Boolean commentUpdateDone(@PathVariable("boardId") Long boardId,
-                                     @RequestBody BoardCommentUpdateFormDto boardCommentUpdateFormDto) {
-        return boardCommentService.updateBoardComment(boardCommentUpdateFormDto.toEntity());
+                                     @RequestBody BoardCommentUpdateCheckRequest boardCommentUpdateCheckRequest) {
+        return boardCommentService.updateBoardComment(boardCommentUpdateCheckRequest.toEntity());
     }
 
     @ResponseBody
-    @PostMapping("{boardId}/{boardCommentId}")
-    public Boolean commentDeleteDone(@PathVariable("boardId") Long boardId, @PathVariable("boardCommentId") Long boardCommentId,
-                                    @RequestParam("insertDeleteBoardComment") String deleteBoardCommentPassword) {
-        return boardCommentService.deleteBoardComment(boardCommentId, deleteBoardCommentPassword);
+    @PostMapping("{boardId}/checkDeleteBoardCommentRequest")
+    public Boolean commentDeleteDone(@PathVariable("boardId") Long boardId,
+                                     @RequestBody BoardCommentDeleteCheckRequest boardCommentDeleteCheckRequest) {
+        return boardCommentService.deleteBoardComment(boardCommentDeleteCheckRequest.getBoardCommentId(),
+                boardCommentDeleteCheckRequest.getBoardCommentPassword());
     }
 }

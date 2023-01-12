@@ -4,7 +4,7 @@ import com.giantstep.board.domain.board.entity.BoardComment;
 import lombok.Data;
 
 @Data
-public class BoardCommentUpdateFormDto {
+public class BoardCommentUpdateCheckRequest {
     private Long boardCommentId;
     private String boardCommentContents;
     private String boardCommentPassword;

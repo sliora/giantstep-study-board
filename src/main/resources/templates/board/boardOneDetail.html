@@ -96,15 +96,16 @@
                             </div>
                             <div class="modal-body">
                                 <form id="updateBoardCommentForm">
-                                    <input hidden th:value="${boardCommentList.boardCommentId}" id="updateBoardCommentId" >
-                                    <textarea th:text="${boardCommentList.boardCommentContents}" id="updateBoardCommentContents"></textarea>
+                                    <textarea th:id="updateBoardCommentContents + ${boardCommentList.boardCommentId}" th:text="${boardCommentList.boardCommentContents}" ></textarea>
                                     <br>
-                                    <input id="updateBoardCommentPassword" placeholder="비밀번호 입력하세요" >
+                                    <input th:id="updateBoardCommentPassword + ${boardCommentList.boardCommentId}" placeholder="비밀번호 입력하세요" >
                                 </form>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary waves-effect wave-light" data-dismiss="modal" >취소하기</button>
-                                <button type="button" onclick="commentUpdateDone()" class="btn btn-danger waves-effect wave-light">수정하기</button>
+                                <button type="button" th:selectBoardCommentId="${boardCommentList.boardCommentId}"
+                                        th:onclick="commentUpdateDone(this.getAttribute('selectBoardCommentId'))"
+                                        class="btn btn-danger waves-effect wave-light">수정하기</button>
                             </div>
                         </div>
                     </div>
@@ -124,13 +125,14 @@
                             </div>
                             <div class="modal-body">
                                 <form id="commentDeleteCheckForm">
-                                    <input hidden id="deleteBoardCommentId" th:value="${boardCommentList.boardCommentId}">
-                                    <input id="insertDeleteBoardCommentPassword" placeholder="비밀번호 입력하세요.">
+                                    <input th:id="insertDeleteBoardCommentPassword + ${boardCommentList.boardCommentId}" placeholder="비밀번호 입력하세요.">
                                 </form>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary waves-effect wave-light" data-dismiss="modal" >취소하기</button>
-                                <button type="button" onclick="commentDeleteDone()" class="btn btn-danger waves-effect wave-light">삭제하기</button>
+                                <button type="button" th:selectBoardCommentId="${boardCommentList.boardCommentId}"
+                                        th:onclick="commentDeleteDone(this.getAttribute('selectBoardCommentId'))"
+                                        class="btn btn-danger waves-effect wave-light">삭제하기</button>
                             </div>
                         </div>
                     </div>
@@ -138,7 +140,7 @@
                 <!-- 댓글 삭제 Modal 끝 -->
 
                 <br>
-                <textarea th:id="c + ${boardCommentList.boardCommentId}" th:text="${boardCommentList.boardCommentContents}" readonly></textarea>
+                <textarea th:text="${boardCommentList.boardCommentContents}" readonly></textarea>
                 <br>
             </div>
 
@@ -189,7 +191,7 @@
         </div>
     </div>
 
-    <script type="text/javascript">
+    <script type="text/javascript" th:inline="javascript">
 
         function commentAddDone() {
             const data = {
@@ -221,11 +223,12 @@
             document.getElementById('commentAddForm').submit();
         };
 
-        function commentUpdateDone() {
+        function commentUpdateDone(boardCommentId) {
+
             const data = {
-                updateBoardCommentId : document.getElementById('updateBoardCommentId').value,
-                updateBoardCommentContents: document.getElementById('updateBoardCommentContents').value,
-                updateBoardCommentPassword: document.getElementById('updateBoardCommentPassword').value
+                updateBoardCommentId : boardCommentId,
+                updateBoardCommentContents: document.getElementById("updateBoardCommentContents" + boardCommentId).value,
+                updateBoardCommentPassword: document.getElementById("updateBoardCommentPassword" + boardCommentId).value
             }
             //댓글 수정 폼 유효성 검사
             if (data.updateBoardCommentContents == null || data.updateBoardCommentContents.trim()===''){
@@ -263,8 +266,8 @@
 
         };
 
-        function commentDeleteDone() {
-            const deleteBoardCommentPassword = document.getElementById('insertDeleteBoardCommentPassword').value;
+        function commentDeleteDone(boardCommentId) {
+            const deleteBoardCommentPassword = document.getElementById('insertDeleteBoardCommentPassword'+boardCommentId).value;
 
             //댓글 삭제 비밀번호 유효성 검사
             if (deleteBoardCommentPassword.trim()===''){
@@ -272,14 +275,14 @@
                 return false;
             }
 
-            const deleteBoardCommentId = document.getElementById('deleteBoardCommentId').value;
-
             $.ajax({
-                url : deleteBoardCommentId,
+                url : "checkDeleteBoardCommentRequest",
                 type : "POST",
-                data : { "insertDeleteBoardComment" : deleteBoardCommentPassword,
-                         "deleteBoardCommentId" : deleteBoardCommentId
-                },
+                contentType: 'application/json; charset=utf-8',
+                data : JSON.stringify({
+                    "boardCommentId" : boardCommentId,
+                    "boardCommentPassword" : deleteBoardCommentPassword
+                }),
                 success : function (data) {
                     if (data == true){
                         document.location.reload();
