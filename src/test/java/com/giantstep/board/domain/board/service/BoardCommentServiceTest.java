@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -37,13 +39,14 @@ class BoardCommentServiceTest {
                 .boardCommentContents("댓글 테스트 데이터 입니다.")
                 .boardCommentPassword("1234")
                 .board(findBoard)
+                .deletedYn("N")
                 .build();
 
         boardCommentRepository.save(boardComment);
     }
 
     @Test
-    void 댓글_조회() {
+    void 댓글_전체_조회() {
 
         //give
         long boardId = 177;
@@ -55,7 +58,32 @@ class BoardCommentServiceTest {
         //then
         assertEquals(byBoardCommentListDtoAddPaging.getTotalElements(), boardCommentRepository.findAll().size()); // 댓글 총개수 비교
         assertEquals(byBoardCommentListDtoAddPaging.getSize(), pageable.getPageSize());
+    }
 
+    @Test
+    void 댓글_단건_조회 (){
+
+        //give
+        long boardId = 177;
+        Board findBoard = boardRepository.findById(boardId).get();
+        BoardComment defaultBoardComment = BoardComment.createBoardComment()
+                .boardCommentWriter("이정준")
+                .boardCommentContents("댓글 테스트 데이터 입니다.")
+                .boardCommentPassword("1234")
+                .board(findBoard)
+                .deletedYn("N")
+                .build();
+
+        BoardComment saveDefaultBoardComment = boardCommentRepository.save(defaultBoardComment);
+        String insertDeleteBoardCommentPassword = "1234";
+
+        //when
+        Optional<BoardComment> findBoardCommentByIdAndPassword =
+                boardCommentRepository.findBoardCommentByIdAndPassword(saveDefaultBoardComment.getId(), insertDeleteBoardCommentPassword);
+
+        //then
+        assertEquals(findBoardCommentByIdAndPassword.get().getId(), saveDefaultBoardComment.getId());
+        assertEquals(findBoardCommentByIdAndPassword.get().getPassword(), insertDeleteBoardCommentPassword);
     }
 
     @Test
@@ -70,6 +98,7 @@ class BoardCommentServiceTest {
                 .boardCommentContents("댓글 테스트 데이터 입니다.")
                 .boardCommentPassword("1234")
                 .board(findBoard)
+                .deletedYn("N")
                 .build();
 
         //when
@@ -78,6 +107,59 @@ class BoardCommentServiceTest {
         //then
         assertEquals(saveBoardComment.getWriter(), boardComment.getWriter());
         assertEquals(saveBoardComment.getContents(), boardComment.getContents());
+    }
+
+    @Test
+    void 댓글_수정() {
+
+        //give
+        long boardId = 177;
+        Board findBoard = boardRepository.findById(boardId).get();
+
+        BoardComment boardComment = BoardComment.createBoardComment()
+                .boardCommentWriter("테스터정준")
+                .boardCommentContents("댓글 테스트 데이터 입니다.")
+                .boardCommentPassword("1234")
+                .board(findBoard)
+                .deletedYn("N")
+                .build();
+
+        BoardComment saveBoardComment = boardCommentRepository.save(boardComment);
+
+        BoardComment updateBoardComment = BoardComment.createBoardComment()
+                .boardCommentId(saveBoardComment.getId())
+                .boardCommentContents("수정된 댓글")
+                .build();
+
+        //when
+        Boolean updateDoneBoardComment = boardCommentRepository.findById(updateBoardComment.getId()).get().updateBoardComment(updateBoardComment);
+
+        //then
+        assertEquals(updateDoneBoardComment, true);
+        assertEquals(saveBoardComment.getContents(), updateBoardComment.getContents());
+    }
+
+    @Test
+    void 댓글_삭제() {
+
+        //give
+        long boardId = 177;
+        Board findBoard = boardRepository.findById(boardId).get();
+        BoardComment defaultBoardComment = BoardComment.createBoardComment()
+                .boardCommentWriter("이정준")
+                .boardCommentContents("댓글 테스트 데이터 입니다.")
+                .boardCommentPassword("1234")
+                .board(findBoard)
+                .deletedYn("N")
+                .build();
+
+        BoardComment saveDefaultBoardComment = boardCommentRepository.save(defaultBoardComment);
+
+        //when
+        boardCommentRepository.findById(saveDefaultBoardComment.getId()).get().deleteBoardComment();
+
+        //then
+        assertEquals(saveDefaultBoardComment.getDeletedYn(), "Y");
     }
 
 }
