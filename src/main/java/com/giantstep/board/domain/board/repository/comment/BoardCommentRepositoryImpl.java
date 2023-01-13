@@ -33,8 +33,7 @@ public class BoardCommentRepositoryImpl implements BoardCommentRepositoryCustom{
                 ))
                 .from(boardComment)
                 .orderBy(boardComment.updateDate.desc())
-                .where(boardComment.board.id.eq(boardId),
-                       boardComment.deletedYn.eq("N"))
+                .where(boardComment.board.id.eq(boardId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -42,8 +41,7 @@ public class BoardCommentRepositoryImpl implements BoardCommentRepositoryCustom{
         JPAQuery<Long> boardCommentCount = queryFactory
                 .select(boardComment.count())
                 .from(boardComment)
-                .where(boardComment.board.id.eq(boardId),
-                       boardComment.deletedYn.eq("N"));
+                .where(boardComment.board.id.eq(boardId));
 
         return PageableExecutionUtils.getPage(boardCommentListDtoList, pageable, boardCommentCount::fetchOne);
     }
