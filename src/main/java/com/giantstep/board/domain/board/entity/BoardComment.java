@@ -30,29 +30,14 @@ public class BoardComment extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Board board;
 
-    /** 댓글 상태 */
-    private String deletedYn;
-
     @Builder(builderClassName = "createBoardComment", builderMethodName = "createBoardComment")
     public BoardComment(Long boardCommentId, String boardCommentWriter,
-                        String boardCommentContents, String boardCommentPassword, Board board,
-                        String deletedYn){
+                        String boardCommentContents, String boardCommentPassword, Board board){
         this.id = boardCommentId;
         this.writer = boardCommentWriter;
         this.contents = boardCommentContents;
         this.password = boardCommentPassword;
         this.board = board;
-        this.deletedYn = deletedYn;
-    }
-
-    public Boolean updateBoardComment(BoardComment updateBoardComment) {
-        this.contents = updateBoardComment.getContents();
-        return true;
-    }
-
-    public Boolean deleteBoardComment() {
-        this.deletedYn = "Y";
-        return true;
     }
 
 }
